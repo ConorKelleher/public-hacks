@@ -1,24 +1,72 @@
 #include <iostream>
+#include <ctime>
 
-int main()
-{
-    std::cout << "You're going to be murdered if you can't break into this house!";
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << "You need to enter the correct code to continue...!";
-    std::cout << std::endl;
+void PrintIntroduction(int LevelDifficulty);
 
-    int a = 4;
-    int b = 7;
-    int c = 17;
+bool PlayGame(int LevelDifficulty) {
+    PrintIntroduction(LevelDifficulty);
 
-    a = 7;
+    int CodeA = rand() % (LevelDifficulty + 1) + LevelDifficulty;
+    int CodeB = rand() % (LevelDifficulty + 1) + LevelDifficulty;
+    int CodeC = rand() % (LevelDifficulty + 1) + LevelDifficulty;
 
-    int sum = a + b + c;
-    int product = a * b * c;
+    int CodeSum = CodeA + CodeB + CodeC;
+    int CodeProduct = CodeA * CodeB * CodeC;
 
-    std::cout << sum << std::endl;
-    std::cout << product << std::endl;
+    std::cout << "The sum of the numbers is: " << CodeSum;
+    std::cout << "\nThe product of the numbers is:" << CodeProduct;
+    std::cout << "\nThe numbers are...?: ";
+
+    int GuessA, GuessB, GuessC;
+
+    // Get user input for 3 fields
+    std::cin >> GuessA;
+    std::cin >> GuessB;
+    std::cin >> GuessC;
+
+    int GuessSum = GuessA + GuessB + GuessC;
+    int GuessProduct = GuessA * GuessB * GuessC;
+    bool GuessedCorrect = GuessSum == CodeSum && GuessProduct == CodeProduct;
+
+    if (GuessedCorrect) {
+        std::cout << "You got it! You're a good person!\n\n";
+    } else {
+        std::cout << "NOOOO! They gonsta keel yoooo!\n\n";
+    }
+
+    return GuessedCorrect;
+}
+
+void PrintIntroduction(int LevelDifficulty) {
+    std::cout << "\n\nYou're going to be murdered if you can't break into house no. " << LevelDifficulty << "!\n\n";
+    std::cout << "You need to enter the correct code to continue...!\n\n";
+}
+
+void ClearInputBuffer() {
+    std::cin.clear();
+    std::cin.ignore();
+}
+
+int main() {
+    srand(time(NULL));
+    bool bLevelComplete = false;
+    int LevelDifficulty = 1;
+    const int MaxDifficulty = 3;
+
+    do {
+        bLevelComplete = PlayGame(LevelDifficulty);
+        ClearInputBuffer();
+
+        if (bLevelComplete) {
+            ++LevelDifficulty;
+        }
+    } while (bLevelComplete && LevelDifficulty <= MaxDifficulty);
+
+    if (bLevelComplete) {
+        std::cout << "Woo, you're safe!";
+    } else {
+        std::cout << "You're dead now. So sad.";
+    }
 
     return 0;
 }
