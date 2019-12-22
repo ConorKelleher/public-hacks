@@ -10,35 +10,7 @@ void UBullCowCartridge::BeginPlay() // When the game starts
 
 void UBullCowCartridge::OnInput(const FString& Input) // When the player hits enter
 {
-    if (bGameOver) {
-        // Taking input after game over
-        bGameOver = false;
-        ClearScreen();
-        SetupGame();
-    } else if (Input == HiddenWord) {
-        // In game and correct
-        PrintLine(TEXT("You got it!"));
-        EndGame();
-    } else {
-        // In game and not correct
-        if (!IsIsogram(Input)) {
-            PrintLine(TEXT("That is not an isogram.\nYour guess must not have any repeating characters"));
-        } else if (Input.Len() != HiddenWord.Len()) {
-            PrintLine(TEXT("Your guess is the wrong number of characters.\nIt must be %i letters long"), HiddenWord.Len());
-        } else {
-            PrintLine(TEXT("NOOP! You are a losing person"));
-            --Lives;
-        }
-
-        if (Lives > 0) {
-            // Still have lives, keep it going
-            PrintLine(TEXT("Try again. You have %i lives left"), Lives);
-        } else {
-            // No more lives, game is over
-            PrintLine(TEXT("You're out of lives. Tough luck!"));
-            EndGame();
-        }
-    }
+    ProcessGuess(Input);
 }
 
 void UBullCowCartridge::SetupGame() {
@@ -52,11 +24,66 @@ void UBullCowCartridge::SetupGame() {
     PrintLine(TEXT("Hit <enter> after your guess to submit..."));
 }
 
-bool UBullCowCartridge::IsIsogram(FString str) {
-    return true;
+bool UBullCowCartridge::IsIsogram(FString Word) const {
+    bool bIsIsogram = true;
+    for (int32 i=0; i<Word.Len(); i++) {
+        for (int32 j=0; j<Word.Len(); j++) {
+            if (i == j) {
+                continue;
+            }
+            if (Word[i] == Word[j]) {
+                bIsIsogram = false;
+                break;
+            }
+        }
+    }
+    return bIsIsogram;
 }
 
 void UBullCowCartridge::EndGame() {
-    PrintLine(TEXT("\nWould you like to play again? (Press Enter)"));
     bGameOver = true;
+    PrintLine(TEXT("\nWould you like to play again? (Press Enter)"));
+}
+
+void UBullCowCartridge::ProcessGuess(FString Guess) {
+    if (bGameOver) {
+        // Taking input after game over
+        bGameOver = false;
+        ClearScreen();
+        SetupGame();
+        return;
+    }
+
+    if (Guess == HiddenWord) {
+        // In game and correct
+        PrintLine(TEXT("You got it!"));
+        EndGame();
+        return;
+    }
+
+    if (Guess.Len() != HiddenWord.Len()) {
+        PrintLine(TEXT("Your guess is the wrong number of characters.\nIt must be %i letters long"), HiddenWord.Len());
+        return;
+    }
+
+    if (!IsIsogram(Guess)) {
+        PrintLine(TEXT("That is not an isogram.\nYour guess must not have any repeating characters"));
+        return;
+    }
+    
+
+    // In game and not correct
+    PrintLine(TEXT("NOOP! You are a losing person"));
+
+    if (--Lives > 0) {
+        // Still have lives, keep it going
+        PrintLine(TEXT("Try again. You have %i lives left"), Lives);
+    } else {
+        // No more lives, game is over
+        ClearScreen();
+        PrintLine(TEXT("You're out of lives. Tough luck!"));
+        PrintLine(TEXT("The secret word was: %s"), *HiddenWord);
+        EndGame();
+        return;
+    }
 }
