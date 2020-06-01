@@ -1,0 +1,2 @@
+C:\Users\conor\Documents\public-hacks\C++ Projects\OpenGL\Debug\OpenGL.exe
+C:\Users\conor\Documents\public-hacks\C++ Projects\OpenGL\Debug\OpenGL.pdb
